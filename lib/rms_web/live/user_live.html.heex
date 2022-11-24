@@ -1,0 +1,49 @@
+<h1>Listing Users</h1>
+
+<h1><%= @greetings %></h1>
+
+<%= if @live_action in [:new, :edit] do %>
+
+ <.modal return_to={Routes.user_index_path(@socket, :index)}>
+
+  <.form let={f} for={@changeset}  id="multiselect-form" phx-change="validate">
+    <.live_component
+       module={RmsWeb.Live.MultiselectComponet}
+       occupation={@aoss}
+       id={@user.id || :new || :multi}
+       title={@page_title}
+       action={@live_action}
+       user={@user}
+       return_to={Routes.user_index_path(@socket, :index)}
+    />
+  </.form>
+ </.modal>
+<% end %>
+
+    <table>
+        <thead>
+            <tr>
+                <th>age</th>
+                <th>aos</th>
+
+                <th></th>
+            </tr>
+        </thead>
+        <tbody id="users">
+            <%= for user <- @users do %>
+                <tr id={"user-#{user.id}"}>
+                    <td><%= user.age %></td>
+                    <td><%= user.aos %></td>
+
+                    <td>
+                        <span><%= live_redirect "Show", to: Routes.user_show_path(@socket, :show, user) %></span>
+                        <span><%= live_patch "Edit", to: Routes.user_index_path(@socket, :edit, user) %></span>
+                        <span><%= link "Delete", to: "#", phx_click: "delete", phx_value_id: user.id, data: [confirm: "ARE YOU Sure"] %></span>
+                    </td>
+                </tr>
+            <% end %>
+        </tbody>    
+    </table>
+
+
+    <span><%= live_patch "New User", to: Routes.user_index_path(@socket, :new) %></span>
