@@ -1,21 +1,19 @@
-defmodule RmsWeb.Live.MultiSelectComponent do
+defmodule RmsWeb.MultiSelectComponent do
   use RmsWeb, :live_component
-
-  # alias Rms.Multisect
 
   def render(assigns) do
     ~H"""
-    <div class="multiselect">
-      <div class="fake_select_tag"
+    <div class="occupation">
+      <div class="select"
         id={"#{@id}-selected-occupation-container"}>
-        <%= for occ <- @selected_occupation do %>
-          <div class="selected_occupation">
-            <%= occ.fos %>
-          </div>
-        <% end %>
+          <%= for occ <- @selected_occupation do %>
+            <div class="selected_occupation">
+              <%= occ.fos %>
+            </div>
+          <% end %>
 
         <div class="icon">
-        
+
           <svg id={"#{@id}-down-icon"}>
             phx-click={
               JS.toggle()
@@ -35,46 +33,58 @@ defmodule RmsWeb.Live.MultiSelectComponent do
 
         </div>
       </div>
-      <div id={"#{@id}"}-occupation-container>
-        <%= inputs_for @form, :occupation, fn occ -> %>
+      <div class="hidden" id={"#{@id}"}-occupation-container>
+        <%= inputs_for @form, :occupation, fn value -> %>
           <div class="form-check">
-            <div class="selectable-occupation">
-              <%= checkbox occ, :title, occ.data.title phx_change: "checked", phx_target: {@myself} %>
-              <%= checkbox occ, :title, occ: occ.data.title %>
-              <%= label occ, :fos, occ.data.fos %>
+
+              <label class="form-check">
+                <%= checkbox value, :selected, phx_change: "checked", phx_target: {@myself}, value: value.data.selected %>
+                <%= label value, :fos, value: value.data.fos class: "ml-2" %>
+                <%= hidden_input value, :fos, value.data.fos %>
+              </label>
             </div>
-          </div>
+
         <% end %>
       </div>
     </div>
     """
   end
 
-  def update(%{occupation: occupation, form: form, id: id} = assigns, socket) do
-    {:ok,
+  def update(assigns, socket) do
+
+    %{occupation: occupation, form: form, selected: selected, id: id} = assigns
+
+    socket =
      socket
      |> assign(:id, id)
+     |> assign(:selected_occupation, filter_selected_occupation(occupation))
      |> assign(:selectable_occupation, occupation)
      |> assign(:form, form)
-     |> assign(:selected_occupation, filter_selected_occupation(occupation))}
+     |> assign(:selected, selected)
+
+
+     {:ok, socket}
   end
 
   def handle_event("checked", %{"multi_select" => %{"occupation" => occ}}, socket) do
 
-    [{index, %{"title" => title?}}] = Map.to_list(occ)
+    [{index, %{"selected" => selected?}}] = Map.to_list(occ)
 
-    index =String.to_integer(index)
+    index = String.to_integer(index)
 
-    current_occupation = Enum.at(socket.assigns.occupation, index)
+    selectable_occupation = socket.assigns.selectable_occupation
 
-    updated_occupation = List.replace_at(socket.assigns.occupation, index, %{current_occupation | title: title?})
+    current_occupation = Enum.at(selectable_occupation, index)
 
-    socket.assigns.selected.(updated_occupation)
+
+    updated_occupation = List.replace_at(selectable_occupation, index, %{current_occupation | selected: selected?})
+
+    send(self(), {:updated_occupation, updated_occupation})
 
     {:noreply, socket}
   end
 
-  defp filter_selected_occupation(occupations) do
-    Enum.filter(occupations, fn occ -> occ.selected in [true, "true"] end )
+  defp filter_selected_occupation(occupation) do
+    Enum.filter(occupation, fn occ -> occ.selected in [true, "true"] end )
   end
 end

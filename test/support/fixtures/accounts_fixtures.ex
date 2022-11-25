@@ -1,7 +1,7 @@
-defmodule Rms.AccountsFixtures do
+defmodule Rms.UsersFixtures do
   @moduledoc """
   This module defines test helpers for creating
-  entities via the `Rms.Accounts` context.
+  entities via the `Rms.Users` context.
   """
 
   @doc """
@@ -14,7 +14,7 @@ defmodule Rms.AccountsFixtures do
         age: 42,
         name: "some name"
       })
-      |> Rms.Accounts.create_user()
+      |> Rms.Users.create_user()
 
     user
   end

@@ -1,29 +1,30 @@
 defmodule Rms.Users.User do
   use Ecto.Schema
+
   import Ecto.Changeset
 
-  schema "users" do
-    field :age, :integer
-    field :aos, :string
 
-    embeds_many :occupation, Occupation do
-      field :title, :string
-      field :fos, :string
-    end
+  schema "users" do
+    field :name, :string
+    field :age, :integer
+    field :aos,  :string
+
+    embeds_many :occupation, Rms.Users.Occupation, on_replace: :delete
 
     timestamps()
   end
 
+
   @doc false
-  def changeset(schema, attrs) do
-    schema
-    |> cast(attrs, [:aos, :age])
-    |> cast_embed(:occupation, with: &occupation_changeset/2)
-    |> validate_required([:aos, :age])
+  def changeset(user, attrs) do
+    user
+    |> cast(attrs, [:name, :age, :aos])
+    |> cast_embed(:occupation, required: true, with: &Rms.Users.Occupation.changeset/2)
+    |> validate_required([:name, :age, :aos])
   end
 
-  defp occupation_changeset(schema, attrs) do
-    schema
-    |> cast(attrs, [:title, :fos])
+  def occupation_changeset(user, occupation \\ []) do
+    user
+    |> put_embed(:occupation, occupation)
   end
 end

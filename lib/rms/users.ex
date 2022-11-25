@@ -1,6 +1,6 @@
 defmodule Rms.Users do
   @moduledoc """
-  The Accounts context.
+  The User    s context.
   """
 
   import Ecto.Query, warn: false
@@ -102,9 +102,4 @@ defmodule Rms.Users do
     User.changeset(user, attrs)
   end
 
-  def get_users_by_aos(aoss) do
-    Repo.all(
-      from(u in Rms.Users.User, where: fragment("? && ?", u.aos, ^aoss))
-      )
-  end
 end

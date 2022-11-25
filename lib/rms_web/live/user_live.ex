@@ -1,100 +1,131 @@
 defmodule RmsWeb.UserLive do
   use RmsWeb, :live_view
 
-  alias Rms.Users
+  alias Rms.Repo
   alias Rms.Users.User
 
-
-
-  @impl true
   def mount(_params, _session, socket) do
-
-    aoss =
-    [
-      %Occupation{id: 1, title: "Software Engineer", fos: "IT"},
-      %Occupation{id: 2, title: "Line Manager", fos: "CS"}
-    ]
-
-    |> build_occupations()
-
-    {:ok, multiselect_occupation(socket, aoss)}
-
+    {:ok,
+     socket
+     |> assign(:users, Repo.all(User))}
   end
 
-  defp multiselect_occupation(socket, aoss) do
-    changeset = Rms.change_user(user)
+  def render(assigns) do
+    ~H"""
 
-    socket
-    |> assign(:changeset, changeset)
-    |> assign(:aoss, aoss)
-    |> assign(:greetings, "Hello User, Welcome Aboard!!")
-    |> assign(:users,filter_users(aos))
+
+
+    <div>
+
+      <%= for user <- @users do%>
+
+        <h1><%= user.name%></h1>
+        <div class="dropdown">
+        <span><%= user.aos %></span>
+
+        <div class={if(Enum.count(user.occupation, fn occ -> occ.selected == false end) > 0, do: "dropdown-content")}>
+
+
+          <%= for unselected_occupation <- Enum.filter(user.occupation, fn occ -> occ.selected == false end) do %>
+
+          <div style="display: flex; flex-direction: row;" class="unselected_hover">
+
+          <span
+          phx-click={"select_user"}
+          phx-value-user_id={user.id}
+          phx-value-occupation_id={unselected_occupation.id}
+          >
+
+            <%= unselected_occupation.fos %>
+          </span>
+        </div>
+          <% end %>
+        </div>
+
+        <div style="display: flex; flex-direction: row;">
+        <%= for occupation <- Enum.filter(user.occupation, fn occ -> occ.selected == true end) do%>
+
+          <span
+          style="margin: 10px; background-color: purple; padding: 10px; border-radius: 5px; color: white;"
+          phx-click={"deselect_user"}
+          phx-value-user_id={user.id}
+          phx-value-occupation_id={occupation.id}
+          >
+
+            <%= occupation.fos %>
+          </span>
+        <% end %>
+        </div>
+        </div>
+      <% end %>
+    </div>
+
+    """
   end
 
-  @impl true
-  def handle_info({:updated_occupation, occupation}, socket) do
-    {:noreply, multiselect_occupation(socket, occupation)}
-  end
+  def handle_event(
+        "select_user",
+        %{"user_id" => user_id, "occupation_id" => occupation_id},
+        socket
+      ) do
+    user = Rms.Repo.get(User, user_id)
 
-  def handle_params(params, _url, socket) do
-    {:noreply, apply_event(socket, socket.assigns.live_action, params)}
-  end
+    user_occupations =
+      user.occupation
+      |> Enum.map(fn occ ->
+        occupation_struct = Map.from_struct(occ)
 
-  defp build_options(options) do
-    Enum.map(occupation,
-      fn {_idx, data} -> %SelectOccupation{id: data["id"], fos: data["fos"], title: data["title"]}
-      data -> %SelectOccupation{id: data.id, fos: data.fos, title: data.title}
-    end)
-  end
-
-  defp filter_users(occupation) do
-    selected_occupation =
-      Enum.flat_map(occupation, fn occ ->
-        if occ.title in [true, "true"] do
-          [occ.title]
+        if occ.id == occupation_id do
+          occupation_struct
+          |> Map.update!(:selected, fn _ -> true end)
         else
-          []
+          occupation_struct
         end
-    end)
+      end)
 
-    if selected_occupation == [] do
-      Users.list_users()
-    else
-      Users.get_users_by_aos(selected_occupation)
+    user
+    |> Ecto.Changeset.change(%{occupation: user_occupations})
+    |> Rms.Repo.update()
+    |> IO.inspect()
+    |> case do
+      {:ok, _user} ->
+        {:noreply, socket |> assign(:users, Repo.all(User))}
+
+      _ ->
+        {:noreply, socket}
     end
   end
 
-  defp apply_event(socket, :index, _params) do
-    socket
-    |> assign(:page_title, "List of Users")
-    |> assign(:user, nil)
+  def handle_event(
+        "deselect_user",
+        %{"user_id" => user_id, "occupation_id" => occupation_id},
+        socket
+      ) do
+    user = Rms.Repo.get(User, user_id)
+
+    user_occupations =
+      user.occupation
+      |> Enum.map(fn occ ->
+        occupation_struct = Map.from_struct(occ)
+
+        if occ.id == occupation_id do
+          occupation_struct
+          |> Map.update!(:selected, fn _ -> false end)
+        else
+          occupation_struct
+        end
+      end)
+
+    user
+    |> Ecto.Changeset.change(%{occupation: user_occupations})
+    |> Rms.Repo.update()
+    |> IO.inspect()
+    |> case do
+      {:ok, _user} ->
+        {:noreply, socket |> assign(:users, Repo.all(User))}
+
+      _ ->
+        {:noreply, socket}
+    end
   end
-
-  defp apply_event(socket, :edit, %{"id" => id}) do
-    socket
-    |> assign(:page_title, "Edit User")
-    |> assign(:user, Users.get_user!(id))
-  end
-
-  defp apply_event(socket, :new, _params) do
-    socket
-    |> assign(:page_title, "New user")
-    |> assign(:user, %User{})
-  end
-
-
-  @impl true
-  def handle_event("delete", %{"id" => id}, socket) do
-    user = Users.get_user!(id)
-    {:ok, _} = Users.delete_user(user)
-
-    {:noreply, assign(socket, :users, list_users())}
-  end
-
-
-
-  defp list_users do
-    Users.list_users()
-  end
-
 end
