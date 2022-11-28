@@ -51,23 +51,20 @@ defmodule RmsWeb.MultiSelectComponent do
   end
 
   def update(assigns, socket) do
-
     %{occupation: occupation, form: form, selected: selected, id: id} = assigns
 
     socket =
-     socket
-     |> assign(:id, id)
-     |> assign(:selected_occupation, filter_selected_occupation(occupation))
-     |> assign(:selectable_occupation, occupation)
-     |> assign(:form, form)
-     |> assign(:selected, selected)
+      socket
+      |> assign(:id, id)
+      |> assign(:selected_occupation, filter_selected_occupation(occupation))
+      |> assign(:selectable_occupation, occupation)
+      |> assign(:form, form)
+      |> assign(:selected, selected)
 
-
-     {:ok, socket}
+    {:ok, socket}
   end
 
   def handle_event("checked", %{"multi_select" => %{"occupation" => occ}}, socket) do
-
     [{index, %{"selected" => selected?}}] = Map.to_list(occ)
 
     index = String.to_integer(index)
@@ -76,8 +73,8 @@ defmodule RmsWeb.MultiSelectComponent do
 
     current_occupation = Enum.at(selectable_occupation, index)
 
-
-    updated_occupation = List.replace_at(selectable_occupation, index, %{current_occupation | selected: selected?})
+    updated_occupation =
+      List.replace_at(selectable_occupation, index, %{current_occupation | selected: selected?})
 
     send(self(), {:updated_occupation, updated_occupation})
 
@@ -85,6 +82,6 @@ defmodule RmsWeb.MultiSelectComponent do
   end
 
   defp filter_selected_occupation(occupation) do
-    Enum.filter(occupation, fn occ -> occ.selected in [true, "true"] end )
+    Enum.filter(occupation, fn occ -> occ.selected in [true, "true"] end)
   end
 end

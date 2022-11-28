@@ -3,17 +3,15 @@ defmodule Rms.Users.User do
 
   import Ecto.Changeset
 
-
   schema "users" do
     field :name, :string
     field :age, :integer
-    field :aos,  :string
+    field :aos, :string
 
     embeds_many :occupation, Rms.Users.Occupation, on_replace: :delete
 
     timestamps()
   end
-
 
   @doc false
   def changeset(user, attrs) do

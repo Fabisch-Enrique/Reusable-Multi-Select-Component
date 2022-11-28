@@ -19,13 +19,9 @@ defmodule RmsWeb.Router do
 
     get "/page", PageController, :index
 
-
     live "/users", UserLive, :show
-    #live "/users/new", Live.UserLive, :new
-    #live "/users/:id/edit", Live.UserLive, :edit
+    live "/users/:id", DetailLive, :index
 
-    #live "/users/:id", Live.Show, :show
-    #live "/users/:id/show/edit", Live.Show, :edit
   end
 
   # Other scopes may use custom stacks.

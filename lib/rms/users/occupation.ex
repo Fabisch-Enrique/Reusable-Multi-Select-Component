@@ -13,5 +13,4 @@ defmodule Rms.Users.Occupation do
     schema
     |> cast(attrs, [:fos])
   end
-
 end

@@ -13,50 +13,9 @@ defmodule RmsWeb.UserLive do
   def render(assigns) do
     ~H"""
 
-
-
     <div>
-
       <%= for user <- @users do%>
-
-        <h1><%= user.name%></h1>
-        <div class="dropdown">
-        <span><%= user.aos %></span>
-
-        <div class={if(Enum.count(user.occupation, fn occ -> occ.selected == false end) > 0, do: "dropdown-content")}>
-
-
-          <%= for unselected_occupation <- Enum.filter(user.occupation, fn occ -> occ.selected == false end) do %>
-
-          <div style="display: flex; flex-direction: row;" class="unselected_hover">
-
-          <span
-          phx-click={"select_user"}
-          phx-value-user_id={user.id}
-          phx-value-occupation_id={unselected_occupation.id}
-          >
-
-            <%= unselected_occupation.fos %>
-          </span>
-        </div>
-          <% end %>
-        </div>
-
-        <div style="display: flex; flex-direction: row;">
-        <%= for occupation <- Enum.filter(user.occupation, fn occ -> occ.selected == true end) do%>
-
-          <span
-          style="margin: 10px; background-color: purple; padding: 10px; border-radius: 5px; color: white;"
-          phx-click={"deselect_user"}
-          phx-value-user_id={user.id}
-          phx-value-occupation_id={occupation.id}
-          >
-
-            <%= occupation.fos %>
-          </span>
-        <% end %>
-        </div>
-        </div>
+        <%= link user.name, to: Routes.detail_path(@socket,:index, user.id) %>
       <% end %>
     </div>
 
@@ -119,7 +78,6 @@ defmodule RmsWeb.UserLive do
     user
     |> Ecto.Changeset.change(%{occupation: user_occupations})
     |> Rms.Repo.update()
-    |> IO.inspect()
     |> case do
       {:ok, _user} ->
         {:noreply, socket |> assign(:users, Repo.all(User))}
