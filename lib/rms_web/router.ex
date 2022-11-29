@@ -17,6 +17,7 @@ defmodule RmsWeb.Router do
   scope "/", RmsWeb do
     pipe_through :browser
 
+    get "/", PageController, :index
     get "/page", PageController, :index
 
     live "/users", UserLive, :show

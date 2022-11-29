@@ -1,0 +1,21 @@
+<div class="dropdown">
+    <div>
+      <%= for unselected_occupation <- @user.occupation do %>
+        <div style="display:flex;">
+          <%= checkbox(:form, unselected_occupation.fos,id: unselected_occupation.id, phx_click: "update_selected", phx_value_occupation_id: unselected_occupation.id, value: unselected_occupation.selected) %>
+          <label for={unselected_occupation.id}><%= unselected_occupation.fos %></label>
+        </div>
+      <% end %>
+    </div>
+    <div class = "dropdown" style="display: flex; flex-direction: row;">
+      <%= for occupation <- Enum.filter(@user.occupation, fn occ -> occ.selected == true end) do%>
+        <span
+          style="margin: 10px; background-color: purple; padding: 10px; border-radius: 5px; color: white;"
+          phx-click={"update_selected"}
+          phx-value-occupation-id={occupation.id}
+          >
+          <%= occupation.fos %>
+        </span>
+      <% end %>
+    </div>
+  </div>
