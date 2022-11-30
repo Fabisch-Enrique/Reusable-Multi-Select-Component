@@ -4,9 +4,9 @@ defmodule RmsWeb.MultiSelectComponent do
   def update(params, socket) do
     %{user: user} = params
 
-    IO.inspect(user)
-
-    {:ok, assign(socket, :user, user)}
+    {:ok,
+     socket
+     |> assign(:user, user)}
   end
 
   def handle_event(

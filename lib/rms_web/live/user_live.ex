@@ -45,7 +45,6 @@ defmodule RmsWeb.UserLive do
     user
     |> Ecto.Changeset.change(%{occupation: user_occupations})
     |> Rms.Repo.update()
-    |> IO.inspect()
     |> case do
       {:ok, _user} ->
         {:noreply, socket |> assign(:users, Repo.all(User))}

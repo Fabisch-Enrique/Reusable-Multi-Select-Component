@@ -22,7 +22,6 @@ defmodule RmsWeb.Router do
 
     live "/users", UserLive, :show
     live "/users/:id", DetailLive, :index
-
   end
 
   # Other scopes may use custom stacks.
