@@ -11,6 +11,6 @@ defmodule Rms.Users.Occupation do
 
   def changeset(schema, attrs \\ %{}) do
     schema
-    |> cast(attrs, [:fos])
+    |> cast(attrs, [:fos, :selected ])
   end
 end

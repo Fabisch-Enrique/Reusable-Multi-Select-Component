@@ -5,18 +5,17 @@ defmodule RmsWeb.MultiSelectComponent do
   alias Rms.Users.User
 
   def update(params, socket) do
-    %{user: user, id: id, occupation: occupation} = params
+    %{user: user, id: id, occupation: occupation, form: form} = params
 
     {:ok,
      socket
      |> assign(:id, id)
-     |> assign(:changeset, User.changeset(%User{}, %{}))
+     |> assign(:changeset, User.changeset(user, %{}))
+     |> assign(:form, form)
      |> assign(:user, user)
      |> assign(:selected_occupation, filter_selected_occupation(occupation))}
-     |> IO.inspect()
   end
 
-  
   def handle_event(
         "update_selected",
         %{"occupation-id" => occupation_id},
@@ -40,7 +39,13 @@ defmodule RmsWeb.MultiSelectComponent do
     |> Rms.Repo.update()
     |> case do
       {:ok, user} ->
-        {:noreply, socket |> assign(:user, user)}
+        {:noreply,
+         socket
+         |> assign(:user, user)
+         |> assign(:changeset, User.changeset(user, %{}))
+         |> assign(:selected_occupation, filter_selected_occupation(user.occupation))
+
+        }
 
       _ ->
         {:noreply, socket}

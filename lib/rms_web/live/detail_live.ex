@@ -4,30 +4,35 @@ defmodule RmsWeb.DetailLive do
   alias Rms.Users.User
   alias Rms.Repo
 
-
   def mount(%{"id" => id}, _session, socket) do
+    user = Repo.get(User, id)
+
     {:ok,
      socket
      |> assign(:user_id, id)
-     |> assign(:user, Repo.get(User, id))}
+     |> assign(:user, user)
+     |> assign(:changeset, User.changeset(user, %{}))}
   end
 
   def render(assigns) do
     ~H"""
-    <div>
-      <h1><%= @user.name%></h1>
       <div class="relative">
-      <.live_component
-        id="multi-select"
-        module={RmsWeb.MultiSelectComponent}
-        occupation={@user.occupation}
-        user={@user}
+      <.form let={f} for={@changeset} id="multiselect-form">
+        <.live_component
+          id="multi"
+          module={RmsWeb.MultiSelectComponent}
+          occupation={@user.occupation}
+          user={@user}
+          form={f}
 
-        >
-      </.live_component>
+          >
+        </.live_component>
+      </.form>
       </div>
-    </div>
     """
   end
 
+  # def handle updated_occupation({:updated_occupation, occupation}, socket) do
+
+  # end
 end

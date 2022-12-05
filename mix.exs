@@ -49,7 +49,7 @@ defmodule Rms.MixProject do
       {:gettext, "~> 0.18"},
       {:jason, "~> 1.4.0"},
       {:plug_cowboy, "~> 2.6.0"},
-      {:tailwind, "~> 0.1.6", only: :dev}
+     {:tailwind, "~> 0.1", runtime: Mix.env() == :dev}
     ]
   end
 
@@ -65,7 +65,7 @@ defmodule Rms.MixProject do
       "ecto.setup": ["ecto.create", "ecto.migrate", "run priv/repo/seeds.exs"],
       "ecto.reset": ["ecto.drop", "ecto.setup"],
       test: ["ecto.create --quiet", "ecto.migrate --quiet", "test"],
-      "assets.deploy": ["esbuild default --minify", "phx.digest"]
+      "assets.deploy": ["tailwind default --minify", "esbuild default --minify", "phx.digest"]
     ]
   end
 end

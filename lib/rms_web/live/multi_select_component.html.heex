@@ -1,35 +1,30 @@
 <div class="flex justify-center">
-  <div id={"occupation-container-#{@id}"} class="hidden">
-    <form style="border: 10px solid rgb(220, 224, 210);">
-      <div id={"selected-occupation-container-#{@id}"} style="display: flex; flex-direction: row;">
-        <%= for occupation <- Enum.filter(@user.occupation, fn occ -> occ.selected == true end) do %>
-          <div
-            id={"occupation_#{occupation.fos}"}
-            style="margin: 10px; background-color: purple; padding: 10px; border-radius: 5px; color: white;"
-            phx-target={@myself}
-            >
+      <div class="border border-gray-200 dark:border-gray-700 w-96 h-12 pb-2 m-2 w-96 flex relative" id={"selected-occupation-container-#{@id}"}>
+        <%= for occupation <- @selected_occupation do %>
+          <div id={"occupation_#{occupation.fos}"} class="bg-purple-500 shadow-lg rounded-lg mt-2 ml-1 text-white dark:bg-sky-500 inline-block pl-2 pr-2 text-center">
             <%= occupation.fos %>
           </div>
         <% end %>
         <div class="absolute right-0">
-          <svg id={"#{@id}-down-icon"} xmlns="http://www.w3.org/2000/svg" class="" viewBox="0 0 20 20" fill="currentColor" phx-click={JS.toggle() |> JS.toggle(to: "##{@id}-up-icon") |>JS.toggle(to: "#occupations-container-#{@id}")}>
+          <svg id={"#{@id}-down-icon"} xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 absolute right-0 top-3" viewBox="0 0 20 20" fill="currentColor" phx-click={JS.toggle(to: "#occupations-container-#{@id}")}>
             <path fill-rule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clip-rule="evenodd" />
-          </svg>to
-          <svg id={"#{@id}-up-icon"} xmlns="http://www.w3.org/2000/svg" class="h-5 w-5  absolute right-0 top-3 hidden" viewBox="0 0 20 20" fill="currentColor"  phx-click={JS.toggle() |> JS.toggle(to: "##{@id}-down-icon") |> JS.toggle(to: "#occupations-container-#{@id}")}>
-            <path fill-rule="evenodd" d="M14.707 12.707a1 1 0 01-1.414 0L10 9.414l-3.293 3.293a1 1 0 01-1.414-1.414l4-4a1 1 0 011.414 0l4 4a1 1 0 010 1.414z" clip-rule="evenodd" />
           </svg>
+            <svg id={"#{@id}-up-icon"} xmlns="http://www.w3.org/2000/svg" class="h-5 w-5  absolute right-0 top-3 hidden" viewBox="0 0 20 20" fill="currentColor"  phx-click={JS.toggle(to: "#occupations-container-#{@id}")}>
+              <path fill-rule="evenodd" d="M14.707 12.707a1 1 0 01-1.414 0L10 9.414l-3.293 3.293a1 1 0 01-1.414-1.414l4-4a1 1 0 011.414 0l4 4a1 1 0 010 1.414z" clip-rule="evenodd" />
+            </svg>
         </div>
       </div>
-    </form>
-  </div>
-  <div>
-    <%= for selected_occupation <- @user.occupation do %>
-      <div class="hiddden" style="display:flex;">
-            
-        <%= checkbox(:form, selected_occupation.fos, id: selected_occupation.id, phx_target: @myself, phx_click: "update_selected", phx_value_occupation_id: selected_occupation.id, value: selected_occupation.selected)  %>
-        <label for={selected_occupation.id}><%= selected_occupation.fos %></label>
-            
+      <div class="hidden w-96 mt-4 p-4 ml-2 mt-16 absolute z-10 bg-stone-50 shadow-2xl rounded-lg" id={"occupations-container-#{@id}"}>
+        <% IO.inspect(@form, label: "our original form") %> 
+        <%= for %{data: data} = f <- inputs_for(@form, :occupation) do %>
+        <% IO.inspect(f, label: "our occ form") %> 
+        <div class="form-check">
+            <label class="form-check-label inline-block text-gray-800">
+              <%= checkbox(f, :selected, phx_target: @myself, phx_click: "update_selected", phx_value_occupation_id: data.id, value: data.selected) %>
+              <%= label(f, data.fos) %>
+              <%= hidden_inputs_for(f) %>
+            </label>
+          </div>
+        <% end %>
       </div>
-    <% end %>
-  </div>
 </div>
