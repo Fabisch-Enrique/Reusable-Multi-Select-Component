@@ -1,14 +1,22 @@
 defmodule RmsWeb.MultiSelectComponent do
   use RmsWeb, :live_component
 
+  alias Phoenix.LiveView.JS
+  alias Rms.Users.User
+
   def update(params, socket) do
-    %{user: user} = params
+    %{user: user, id: id, occupation: occupation} = params
 
     {:ok,
      socket
-     |> assign(:user, user)}
+     |> assign(:id, id)
+     |> assign(:changeset, User.changeset(%User{}, %{}))
+     |> assign(:user, user)
+     |> assign(:selected_occupation, filter_selected_occupation(occupation))}
+     |> IO.inspect()
   end
 
+  
   def handle_event(
         "update_selected",
         %{"occupation-id" => occupation_id},
@@ -37,5 +45,9 @@ defmodule RmsWeb.MultiSelectComponent do
       _ ->
         {:noreply, socket}
     end
+  end
+
+  defp filter_selected_occupation(occupation) do
+    Enum.filter(occupation, fn occ -> occ.selected == true or occ.selected == "true" end)
   end
 end
