@@ -22,7 +22,7 @@ defmodule RmsWeb.DetailLive do
           <.live_component
             id="multi"
             module={RmsWeb.MultiSelectComponent}
-            occupation={@user.occupation}
+            values={@user.occupation}
             user={@user}
             form={f}
 
@@ -33,7 +33,34 @@ defmodule RmsWeb.DetailLive do
     """
   end
 
-  # def handle updated_occupation({:updated_occupation, occupation}, socket) do
+  def handle_info({:update_things, selected_item_id}, %{assigns: %{user: user}} = socket) do
+    user_occupations =
+      user.occupation
+      |> Enum.map(fn occ ->
+        occupation_struct = Map.from_struct(occ)
 
-  # end
+        if occ.id == selected_item_id do
+          occupation_struct
+          |> Map.update!(:selected, fn _ -> !occupation_struct.selected end)
+        else
+          occupation_struct
+        end
+      end)
+
+    socket =
+      user
+      |> Ecto.Changeset.change(%{occupation: user_occupations})
+      |> Rms.Repo.update()
+      |> case do
+        {:ok, user} ->
+          socket
+          |> assign(:user, user)
+          |> assign(:changeset, User.changeset(user, %{}))
+
+        _ ->
+          socket
+      end
+
+    {:noreply, socket}
+  end
 end
