@@ -43,9 +43,7 @@ defmodule RmsWeb.MultiSelectComponent do
          socket
          |> assign(:user, user)
          |> assign(:changeset, User.changeset(user, %{}))
-         |> assign(:selected_occupation, filter_selected_occupation(user.occupation))
-
-        }
+         |> assign(:selected_occupation, filter_selected_occupation(user.occupation))}
 
       _ ->
         {:noreply, socket}
@@ -54,5 +52,6 @@ defmodule RmsWeb.MultiSelectComponent do
 
   defp filter_selected_occupation(occupation) do
     Enum.filter(occupation, fn occ -> occ.selected == true or occ.selected == "true" end)
+    |> IO.inspect()
   end
 end

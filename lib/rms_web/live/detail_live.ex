@@ -16,18 +16,19 @@ defmodule RmsWeb.DetailLive do
 
   def render(assigns) do
     ~H"""
+    <h2><%= @user.name %></h2>
       <div class="relative">
-      <.form let={f} for={@changeset} id="multiselect-form">
-        <.live_component
-          id="multi"
-          module={RmsWeb.MultiSelectComponent}
-          occupation={@user.occupation}
-          user={@user}
-          form={f}
+        <.form let={f} for={@changeset} id="multiselect-form">
+          <.live_component
+            id="multi"
+            module={RmsWeb.MultiSelectComponent}
+            occupation={@user.occupation}
+            user={@user}
+            form={f}
 
-          >
-        </.live_component>
-      </.form>
+            >
+          </.live_component>
+        </.form>
       </div>
     """
   end
