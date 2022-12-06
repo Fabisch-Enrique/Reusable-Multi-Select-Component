@@ -16,11 +16,7 @@ defmodule RmsWeb.MultiSelectComponent do
      |> assign(:selected_occupation, filter_selected_occupation(occupation))}
   end
 
-  def handle_event(
-        "update_selected",
-        %{"occupation-id" => occupation_id},
-        %{assigns: %{user: user}} = socket
-      ) do
+  def handle_event("update_selected", %{"occupation-id" => occupation_id}, %{assigns: %{user: user}} = socket) do
     user_occupations =
       user.occupation
       |> Enum.map(fn occ ->
@@ -51,7 +47,6 @@ defmodule RmsWeb.MultiSelectComponent do
   end
 
   defp filter_selected_occupation(occupation) do
-    Enum.filter(occupation, fn occ -> occ.selected == true or occ.selected == "true" end)
-    |> IO.inspect()
+    Enum.filter(occupation, fn occ -> occ.selected == true end)
   end
 end

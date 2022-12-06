@@ -16,7 +16,6 @@
       </div>
       <div class="hidden w-96 p-4 ml-2 mt-16 absolute z-10 bg-stone-50 shadow-2xl rounded-lg" id={"occupations-container-#{@id}"}>
         <%= for %{data: data} = f <- inputs_for(@form, :occupation) do %>
-        <% IO.inspect(f) %>
         <div class="form-check">
             <label class="form-check-label inline-block text-gray-800">
               <%= checkbox(f, :selected, phx_target: @myself, phx_click: "update_selected", phx_value_occupation_id: data.id) %>
