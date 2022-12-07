@@ -14,7 +14,7 @@ defmodule RmsWeb.MultiSelectComponent do
   end
 
   def handle_event("update_selected", %{"occupation-id" => selected_occupation_id}, socket) do
-    send(self(), {:update_occupation, selected_occupation_id})
+    send(self(), {:update_occupations, selected_occupation_id})
 
     {:noreply, socket}
   end

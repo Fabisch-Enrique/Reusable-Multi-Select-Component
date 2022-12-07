@@ -47,18 +47,19 @@ defmodule RmsWeb.DetailLive do
         end
       end)
 
-    user
-    |> Ecto.Changeset.change(%{occupation: user_occupations})
-    |> Rms.Repo.update()
-    |> case do
-      {:ok, user} ->
-         socket
-         |> assign(:user, user)
-         |> assign(:changeset, User.changeset(user, %{}))
+    socket =
+      user
+      |> Ecto.Changeset.change(%{occupation: user_occupations})
+      |> Rms.Repo.update()
+      |> case do
+        {:ok, user} ->
+          socket
+          |> assign(:user, user)
+          |> assign(:changeset, User.changeset(user, %{}))
 
-      _ ->
-        socket
-    end
+        _ ->
+          socket
+      end
 
     {:noreply, socket}
   end
